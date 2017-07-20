@@ -7,8 +7,8 @@ from __future__ import absolute_import
 
 from ..core.enums import PaddingUnits, StartEnd
 from ..core.has_props import abstract
-from ..core.properties import (Auto, Bool, Datetime, Either, Enum, Float, Instance, Int,
-                               List, MinMaxBounds, String, TimeDelta)
+from ..core.properties import (Bool, Datetime, Either, Enum, Float, Instance, Int,
+                               List, MinMaxBounds, String, TimeDelta, Tuple)
 from ..model import Model
 
 from .callbacks import Callback
@@ -224,79 +224,18 @@ class FactorRange(Range):
 
     '''
 
-    offset = Float(0, help="""
-    An offset to the (synthetic) range (default: 0)
+    factors = Either(List(String), List(Tuple(String, String)), help="""
+    A list of string factors(categories) to comprise this categorical
+    range.
+    """)
 
-    .. note::
-        The primary usage of this is to support compatibility and integration
-        with other plotting systems, and will not generally of interest to
-        most users.
+    start = Float(readonly=True, help="""
 
     """)
 
-    factors = Either(List(String), List(Int), help="""
-    A list of string or integer factors (categories) to comprise
-    this categorical range.
+    end = Float(readonly=True, help="""
+
     """)
-
-    bounds = Either(Auto, List(String), List(Int), default=None, help="""
-    The bounds that the range is allowed to go to - typically used to prevent
-    the user from panning/zooming/etc away from the data.
-
-    Unlike Range1d and DataRange1d, factors do not have an order and so a
-    min and max cannot be proved in the same way. bounds accepts a list of
-    factors, that constrain the displayed factors.
-
-    By default, bounds are ``None``, allows unlimited panning or zooming.
-
-    If ``bounds='auto'``, bounds will be the same as factors and the plot
-    will not be able to pan or zoom beyond the first and last factors.
-
-    If you provide a list, then only the factors that are in that list will
-    be displayed on the plot and the plot will not pan or zoom outside the
-    first and last items in the shortened factors list. Note the order of
-    factors is the defining order for your plot.
-
-    Values of bounds that are not in factors are acceptable and will simply
-    have no impact on the plot.
-
-    Examples:
-
-    Auto behavior:
-
-    .. code-block:: python
-
-        x_range = FactorRange(
-            factors=["apples", "dogs", "peaches", "bananas", "pigs"],
-            bounds='auto'
-        )
-
-        The plot will display all the factors and you will not be able to
-        pan left of apples or right of pigs.
-
-    Constraining behavior:
-
-    .. code-block:: python
-
-        x_range = FactorRange(
-            factors=["apples", "dogs", "peaches", "bananas", "pigs"],
-            bounds=["apples", "bananas", "peaches"]
-        )
-
-        Only the factors ``["apples", "peaches", "bananas"]`` (in that
-        order) will appear in the plot, and the plot will not pan left of
-        ``"apples"`` or right of ``"bananas"``.
-    """)
-
-    min_interval = Int(default=None, help="""
-    The level that the range is allowed to zoom in, expressed as the
-    minimum number of visible categories. If set to ``None`` (default),
-    the minimum interval is not bound.""")
-
-    max_interval = Int(default=None, help="""
-    The level that the range is allowed to zoom out, expressed as the
-    maximum number of visible categories. Note that ``bounds`` can
-    impose an implicit constraint on the maximum interval as well.""")
 
     def __init__(self, *args, **kwargs):
         if args and "factors" in kwargs:
